@@ -37,6 +37,7 @@ svg { stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round
 
 main { max-width: 1400px; margin: 0 auto; padding: 24px 20px 40px }
 .layout { display: grid; grid-template-columns: 1fr 320px; gap: 22px; align-items: start }
+.layout.solo { grid-template-columns: min(720px, 100%); justify-content: center }
 
 /* ===== 3 列卡片网格 ===== */
 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px }

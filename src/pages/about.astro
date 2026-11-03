@@ -2,12 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import TagCloud from '../components/TagCloud.astro';
-import MonthPanel from '../components/MonthPanel.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-import { getCollection } from 'astro:content';
-import { allTags, monthList } from '../lib/site';
-const entries = await getCollection('blog');
 ---
 
 <!doctype html>
@@ -18,7 +13,7 @@ const entries = await getCollection('blog');
 	<body>
 		<Header active="about" />
 		<main>
-			<div class="layout">
+			<div class="layout solo">
 				<section>
 					<div class="panel">
 						<div class="about-hero">
@@ -47,11 +42,6 @@ const entries = await getCollection('blog');
 						</div>
 					</div>
 				</section>
-
-				<aside class="aside">
-					<TagCloud tags={allTags(entries)} />
-					<MonthPanel months={monthList(entries)} />
-				</aside>
 			</div>
 		</main>
 		<Footer />
