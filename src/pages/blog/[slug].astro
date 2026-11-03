@@ -1,0 +1,58 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import CoverCard from '../../components/CoverCard.astro';
+import ClockIcon from '../../components/ClockIcon.astro';
+import AboutPanel from '../../components/AboutPanel.astro';
+import TagCloud from '../../components/TagCloud.astro';
+import { SITE_TITLE } from '../../consts';
+import { getCollection, render } from 'astro:content';
+import { allTags, prevNextOf, relatedOf, fmtDate } from '../../lib/site';
+
+export async function getStaticPaths() {
+	const entries = await getCollection('blog');
+	return entries.map((entry) => ({
+		params: { slug: entry.id },
+		props: { entry, prevNext: prevNextOf(entry, entries), related: relatedOf(entry, entries), tags: allTags(entries) },
+	}));
+}
+const { entry, prevNext, related, tags } = Astro.props;
+const { prev, next } = prevNext;
+const { Content } = await render(entry);
+---
+<!doctype html>
+<html lang="zh-Hans">
+	<head><BaseHead title={`${SITE_TITLE} · ${entry.data.title}`} description={entry.data.cover.sub} /></head>
+	<body>
+		<Header active="home" />
+		<main>
+			<div class="layout">
+				<section>
+					<CoverCard cover={entry.data.cover} variant="post" />
+					<div class="post-panel">
+						<h1 class="post-title">{entry.data.title}</h1>
+						<div class="post-meta">
+							<ClockIcon />{fmtDate(entry.data.pubDate)}
+							&nbsp;
+							{entry.data.tags.map(t => <a class="tag" href={`/?tag=${encodeURIComponent(t)}`}>{t}</a>)}
+						</div>
+						<div class="prose"><Content /></div>
+						<div class="prevnext">
+							{prev ? <a href={`/blog/${prev.id}/`}>← 上一篇<span class="t">{prev.data.title}</span></a> : <a class="dis" style="pointer-events:none">← 已是最新</a>}
+							{next ? <a href={`/blog/${next.id}/`}>下一篇 →<span class="t">{next.data.title}</span></a> : <a class="dis" style="pointer-events:none">已是最早 →</a>}
+						</div>
+					</div>
+				</section>
+				<aside class="aside">
+					<AboutPanel />
+					<div class="panel"><div class="p-head"><h2>相关推荐</h2></div><div class="rank">
+						{related.map(p => <a href={`/blog/${p.id}/`}><span class="n">荐</span><span class="t">{p.data.title}</span></a>)}
+					</div></div>
+					<TagCloud tags={tags} />
+				</aside>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
