@@ -8,8 +8,9 @@ import CoverCard from '../components/CoverCard.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
 import { allTags } from '../lib/site';
-import { TOOLS } from '../data/tools';
+
 const entries = await getCollection('blog');
+const tools = (await getCollection('tools')).sort((a, b) => a.data.order - b.data.order);
 ---
 
 <!doctype html>
@@ -23,16 +24,23 @@ const entries = await getCollection('blog');
 			<div class="layout">
 				<section>
 					<div class="grid">
-						{TOOLS.map((t) => (
-							<a class="card" href={t.url} target="_blank" rel="noopener">
-								<CoverCard cover={{ lines: [t.name, t.tagline], sub: t.sub, cls: t.cls }} />
+						{tools.map((t) => (
+							<a class="card" href={`/tools/${t.id}/`}>
+								<CoverCard cover={{ lines: [t.data.name, t.data.tagline], sub: t.data.sub, cls: t.data.cls }} />
 								<div class="card-body">
-									<h2 class="card-title" style="-webkit-line-clamp:3;min-height:calc(1.45em*3)">{t.desc}</h2>
-									<div class="tags">{t.tags.map((x) => <span class="tag">{x}</span>)}</div>
+									<h2 class="card-title" style="-webkit-line-clamp:3;min-height:calc(1.45em*3)">{t.data.desc}</h2>
+									<div class="tags">{t.data.tags.map((x) => <span class="tag">{x}</span>)}</div>
 								</div>
 							</a>
 						))}
 					</div>
+					{tools.length === 0 && (
+						<div class="empty-tip show">
+							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h11A2.5 2.5 0 0 1 20 8.5v7a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 15.5v-7Z" /><path d="M8 11.5h8M8 15h5" /></svg>
+							<b>工具页正在整理中</b>
+							<span>每个工具都会写成一篇文章，介绍它是什么、能干什么、怎么上手，敬请期待。</span>
+						</div>
+					)}
 				</section>
 
 				<aside class="aside">

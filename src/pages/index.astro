@@ -8,11 +8,19 @@ import MonthPanel from '../components/MonthPanel.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
 import { fmtDate, allTags, monthList } from '../lib/site';
+import { coverImage } from '../lib/cover';
 const entries = (await getCollection('blog')).sort((a, b) => (b.data.pubDate as unknown as number) - (a.data.pubDate as unknown as number));
-const META = JSON.stringify(entries.map((e) => ({
-	id: e.id, title: e.data.title, date: fmtDate(e.data.pubDate),
-	tags: e.data.tags, cover: e.data.cover, hot: e.data.hot ?? null,
-})));
+const META = JSON.stringify(entries.map((e) => {
+	const img = coverImage(e.data.cover);
+	return {
+		id: e.id, title: e.data.title, date: fmtDate(e.data.pubDate),
+		tags: e.data.tags,
+		cover: { lines: e.data.cover?.lines ?? [], sub: e.data.cover?.sub ?? '', cls: e.data.cover?.cls ?? 'c1' },
+		img,
+		yt: !!img && img.startsWith('https://i.ytimg.com'),
+		hot: e.data.hot ?? null,
+	};
+}));
 ---
 
 <!doctype html>
@@ -30,7 +38,7 @@ const META = JSON.stringify(entries.map((e) => ({
 				<section>
 					<div class="filterbar" id="filterbar"></div>
 					<div class="grid" id="grid"></div>
-					<p class="empty-tip" id="emptyTip">当前筛选条件下暂无内容</p>
+					<p class="empty-tip" id="emptyTip"></p>
 					<div class="pager" id="pager"></div>
 				</section>
 
@@ -81,11 +89,26 @@ const META = JSON.parse(document.getElementById('postMeta').textContent);
 		return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>';
 	}
 
+	const EMPTY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h11A2.5 2.5 0 0 1 20 8.5v7a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 15.5v-7Z"/><path d="M8 11.5h8M8 15h5"/></svg>';
+
+	// 空状态：站里一篇都没有，和「筛不出结果」是两种文案
+	function emptyMarkup() {
+		if (META.length === 0) {
+			return EMPTY_ICON + '<b>还没有发布文章</b><span>内容正在整理中，可以先看看 AI 工具或关于博主。</span>';
+		}
+		return EMPTY_ICON + '<b>没有符合条件的文章</b><span>换个关键词、标签或月份再试试。</span>';
+	}
+
 	function buildCard(p) {
-		const k = p.cover.lines.join('<br>');
+		const img = p.img;
+		const onerr = p.yt ? ' onerror="this.onerror=null;this.src=this.src.replace(\'maxresdefault\',\'mqdefault\')"' : '';
+		const inner = img
+			? '<img class="cover-img" src="' + img + '" alt="' + p.cover.sub + '" loading="lazy" decoding="async"' + onerr + '>'
+			: '<span class="k">' + (p.cover.lines.length ? p.cover.lines.join('<br>') : p.title) + '</span>';
 		const tags = p.tags.map(t => '<span class="tag">' + t + '</span>').join('');
 		return '<a class="card" href="/blog/' + encodeURIComponent(p.id) + '/">' +
-			'<div class="cover ' + p.cover.cls + '"><span class="k">' + k + '</span><span class="s">' + p.cover.sub + '</span></div>' +
+			'<div class="cover ' + p.cover.cls + (img ? ' has-img' : '') + '">' + inner +
+			(p.cover.sub ? '<span class="s">' + p.cover.sub + '</span>' : '') + '</div>' +
 			'<div class="card-body"><h2 class="card-title">' + p.title + '</h2>' +
 			'<div class="card-meta">' + clockIcon() + p.date + '</div>' +
 			'<div class="tags">' + tags + '</div></div></a>';
@@ -98,8 +121,10 @@ const META = JSON.parse(document.getElementById('postMeta').textContent);
 		if (page > pages) page = pages;
 		const start = (page - 1) * PAGE_SIZE;
 		grid.innerHTML = list.slice(start, start + PAGE_SIZE).map(buildCard).join('');
+		tip.innerHTML = total === 0 ? emptyMarkup() : '';
 		tip.classList.toggle('show', total === 0);
 		renderFilterbar();
+		if (total === 0) { pager.innerHTML = ''; return; }
 		let html = '<a href="#" data-act="prev"' + (page === 1 ? ' class="dis"' : '') + '>上一页</a>';
 		for (let i = 1; i <= pages; i++) html += '<a href="#" data-p="' + i + '"' + (i === page ? ' class="on"' : '') + '>' + i + '</a>';
 		html += '<a href="#" data-act="next"' + (page === pages ? ' class="dis"' : '') + '>下一页</a>';

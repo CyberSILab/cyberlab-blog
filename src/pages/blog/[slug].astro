@@ -6,9 +6,11 @@ import CoverCard from '../../components/CoverCard.astro';
 import ClockIcon from '../../components/ClockIcon.astro';
 import AboutPanel from '../../components/AboutPanel.astro';
 import TagCloud from '../../components/TagCloud.astro';
+import PostDonate from '../../components/PostDonate.astro';
 import { SITE_TITLE } from '../../consts';
 import { getCollection, render } from 'astro:content';
 import { allTags, prevNextOf, relatedOf, fmtDate } from '../../lib/site';
+import { videoIdOf } from '../../lib/cover';
 
 export async function getStaticPaths() {
 	const entries = await getCollection('blog');
@@ -20,16 +22,27 @@ export async function getStaticPaths() {
 const { entry, prevNext, related, tags } = Astro.props;
 const { prev, next } = prevNext;
 const { Content } = await render(entry);
+const videoId = videoIdOf(entry.data.cover?.video);
 ---
 <!doctype html>
 <html lang="zh-Hans">
-	<head><BaseHead title={`${SITE_TITLE} · ${entry.data.title}`} description={entry.data.cover.sub} /></head>
+	<head><BaseHead title={`${SITE_TITLE} · ${entry.data.title}`} description={entry.data.cover?.sub ?? entry.data.tags.join('、')} /></head>
 	<body>
 		<Header active="none" />
 		<main>
 			<div class="layout">
 				<section>
-					<CoverCard cover={entry.data.cover} variant="post" />
+					{videoId ? (
+						<div class="video-frame" data-video={videoId}>
+							<CoverCard cover={entry.data.cover} variant="post" fallback={entry.data.title} />
+							<button class="video-play" type="button" data-play aria-label={`在页面内播放：${entry.data.title}`}>
+								<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7.2 17.2 12 9 16.8V7.2Z" /></svg>
+							</button>
+							<a class="video-out" href={`https://www.youtube.com/watch?v=${videoId}`} target="_blank" rel="noopener">YouTube ↗</a>
+						</div>
+					) : (
+						<CoverCard cover={entry.data.cover} variant="post" fallback={entry.data.title} />
+					)}
 					<div class="post-panel">
 						<h1 class="post-title">{entry.data.title}</h1>
 						<div class="post-meta">
@@ -38,6 +51,7 @@ const { Content } = await render(entry);
 							{entry.data.tags.map(t => <a class="tag" href={`/?tag=${encodeURIComponent(t)}`}>{t}</a>)}
 						</div>
 						<div class="prose"><Content /></div>
+						<PostDonate />
 						<div class="prevnext">
 							{prev ? <a href={`/blog/${prev.id}/`}>← 上一篇<span class="t">{prev.data.title}</span></a> : <a class="dis" style="pointer-events:none">← 已是最新</a>}
 							{next ? <a href={`/blog/${next.id}/`}>下一篇 →<span class="t">{next.data.title}</span></a> : <a class="dis" style="pointer-events:none">已是最早 →</a>}
@@ -54,5 +68,24 @@ const { Content } = await render(entry);
 			</div>
 		</main>
 		<Footer />
+		<script is:inline>
+			// 点击封面上的播放按钮，才把 YouTube iframe（nocookie 域）插进来，避免首屏就请求视频
+			document.querySelectorAll('.video-frame [data-play]').forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					var frame = btn.closest('.video-frame');
+					var id = frame && frame.dataset.video;
+					if (!id) return;
+					var box = document.createElement('div');
+					box.className = 'video-embed';
+					var iframe = document.createElement('iframe');
+					iframe.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+					iframe.title = btn.getAttribute('aria-label') || '视频';
+					iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+					iframe.setAttribute('allowfullscreen', '');
+					box.appendChild(iframe);
+					frame.replaceChildren(box);
+				});
+			});
+		</script>
 	</body>
 </html>

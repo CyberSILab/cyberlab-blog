@@ -1,0 +1,84 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import CoverCard from '../../components/CoverCard.astro';
+import AboutPanel from '../../components/AboutPanel.astro';
+import PostDonate from '../../components/PostDonate.astro';
+import { SITE_TITLE } from '../../consts';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+	const tools = (await getCollection('tools')).sort((a, b) => a.data.order - b.data.order);
+	const posts = await getCollection('blog');
+	return tools.map((tool) => {
+		const i = tools.findIndex((t) => t.id === tool.id);
+		const related = posts
+			.filter((p) => p.data.tags.some((t) => tool.data.tags.includes(t)))
+			.sort((a, b) => (b.data.pubDate as unknown as number) - (a.data.pubDate as unknown as number))
+			.slice(0, 4);
+		return {
+			params: { slug: tool.id },
+			props: {
+				tool,
+				prev: tools[i - 1],
+				next: tools[i + 1],
+				nav: tools.map((t) => ({ id: t.id, name: t.data.name })),
+				related,
+			},
+		};
+	});
+}
+
+const { tool, prev, next, nav, related } = Astro.props;
+const { Content } = await render(tool);
+const cover = { lines: [tool.data.name, tool.data.tagline], sub: tool.data.sub, cls: tool.data.cls };
+---
+
+<!doctype html>
+<html lang="zh-Hans">
+	<head><BaseHead title={`${SITE_TITLE} · ${tool.data.name} ${tool.data.tagline}`} description={tool.data.desc} /></head>
+	<body>
+		<Header active="ai-tools" />
+		<main>
+			<div class="layout">
+				<section>
+					<CoverCard cover={cover} variant="post" />
+					<div class="post-panel">
+						<h1 class="post-title">{tool.data.name} · {tool.data.tagline}</h1>
+						<div class="post-meta">
+							<span>{tool.data.sub}</span>
+							{tool.data.tags.map((t) => <a class="tag" href={`/?tag=${encodeURIComponent(t)}`}>{t}</a>)}
+						</div>
+						<div class="prose"><Content /></div>
+						<a class="tool-btn" href={tool.data.url} target="_blank" rel="noopener">
+							前往 {tool.data.name} 官网
+							<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></svg>
+						</a>
+						<PostDonate />
+						<div class="prevnext">
+							{prev ? <a href={`/tools/${prev.id}/`}>← 上一个工具<span class="t">{prev.data.name}</span></a> : <a class="dis" style="pointer-events:none">← 已是第一个</a>}
+							{next ? <a href={`/tools/${next.id}/`}>下一个工具 →<span class="t">{next.data.name}</span></a> : <a class="dis" style="pointer-events:none">已是最后一个 →</a>}
+						</div>
+					</div>
+				</section>
+				<aside class="aside">
+					<AboutPanel />
+					<div class="panel"><div class="p-head"><h2>全部工具</h2><a href="/ai-tools/">查看全部</a></div><div class="rank">
+						{nav.map((t, i) => (
+							<a href={`/tools/${t.id}/`} class:list={[{ cur: t.id === tool.id }]} aria-current={t.id === tool.id ? 'page' : undefined}>
+								<span class="n">{i + 1}</span><span class="t">{t.name}</span>
+							</a>
+						))}
+					</div></div>
+					{related.length > 0 && (
+						<div class="panel"><div class="p-head"><h2>相关教程</h2></div><div class="rank">
+							{related.map((p) => <a href={`/blog/${p.id}/`}><span class="n">荐</span><span class="t">{p.data.title}</span></a>)}
+						</div></div>
+					)}
+				</aside>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>

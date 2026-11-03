@@ -1,7 +1,18 @@
 ---
-const { cover, variant = 'card' } = Astro.props;
+import { coverImage, ytFallbackAttr } from '../lib/cover';
+const { cover, variant = 'card', fallback = '' } = Astro.props;
+const img = coverImage(cover);
+const cls = cover?.cls ?? 'c1';
+const lines = cover?.lines ?? (fallback ? [fallback] : []);
+const onerror = ytFallbackAttr(img);
 ---
-<div class:list={['cover', cover.cls, { 'post-cover': variant === 'post' }]}>
-	<span class="k">{cover.lines.join('\n')}</span>
-	<span class="s">{cover.sub}</span>
+<div class:list={['cover', cls, { 'post-cover': variant === 'post', 'has-img': !!img }]}>
+	{
+		img ? (
+			<img class="cover-img" src={img} alt={cover?.sub ?? ''} loading="lazy" decoding="async" onerror={onerror} />
+		) : (
+			<span class="k">{lines.join('\n')}</span>
+		)
+	}
+	{cover?.sub && <span class="s">{cover.sub}</span>}
 </div>

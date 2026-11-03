@@ -10,7 +10,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "covers": "node scripts/fetch-covers.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

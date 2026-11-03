@@ -1,0 +1,190 @@
+---
+// 收款码：图片位于 public/donate/；留空则显示占位框。
+const QR = {
+	alipay: '/donate/alipay.png',
+	wechat: '/donate/wechat.png',
+};
+
+const METHODS = [
+	{ id: 'alipay', name: '支付宝', qr: QR.alipay, tip: '打开支付宝「扫一扫」，感谢你的支持' },
+	{ id: 'wechat', name: '微信支付', qr: QR.wechat, tip: '打开微信「扫一扫」，感谢你的支持' },
+];
+---
+
+<div class="coffee-mask" id="coffeeMask" hidden>
+	<div class="coffee-popup" role="dialog" aria-modal="true" aria-labelledby="coffeeTitle" tabindex="-1">
+		<svg class="coffee-deco" viewBox="0 0 64 64" aria-hidden="true">
+			<g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M14 24h28v14a10 10 0 0 1-10 10H24a10 10 0 0 1-10-10V24Z" />
+				<path d="M42 28h5a6 6 0 0 1 0 12h-5" />
+				<path d="M20 14v4M28 12v6M36 14v4" />
+			</g>
+		</svg>
+
+		<button type="button" class="coffee-close" data-coffee-close aria-label="关闭">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17" /></svg>
+		</button>
+
+		<div class="coffee-select" data-coffee-page="select">
+			<h2 class="coffee-title" id="coffeeTitle">
+				<svg class="coffee-title-icon" viewBox="0 0 24 24" aria-hidden="true">
+					<path d="M5 9h11v5.5A3.5 3.5 0 0 1 12.5 18h-4A3.5 3.5 0 0 1 5 14.5V9Z" />
+					<path d="M16 10.5h1.4a2.6 2.6 0 0 1 0 5.2H16" />
+					<path d="M8 3.5v1.8M11.5 3.5v1.8M15 3.5v1.8" />
+				</svg>
+				请我喝杯咖啡
+			</h2>
+			<p class="coffee-subtitle">如果喜欢本站的内容，欢迎请我喝杯咖啡</p>
+
+			<div class="coffee-pay-list">
+				{
+					METHODS.map((m) => (
+						<button type="button" class="coffee-pay" data-coffee-pay={m.id} aria-label={`${m.name}收款码`}>
+							<span class:list={['coffee-pay-icon', `is-${m.id}`]} aria-hidden="true">
+								{m.id === 'alipay' ? (
+									<span class="coffee-alipay-glyph">支</span>
+								) : (
+									<svg class="coffee-wechat-glyph" viewBox="0 0 24 24">
+										<path
+											d="M9.1 4C5.2 4 2 6.5 2 9.6c0 1.7.9 3.2 2.4 4.2l-.6 2 2.2-1.1c.5.1 1 .2 1.5.2h.3a5.3 5.3 0 0 1-.1-1c0-2.9 2.8-5.2 6.3-5.2h.4C13.9 5.9 11.7 4 9.1 4Z"
+											fill="currentColor"
+											stroke="none"
+										/>
+										<path
+											d="M22 13.9c0-2.6-2.6-4.7-5.8-4.7s-5.8 2.1-5.8 4.7 2.6 4.7 5.8 4.7c.6 0 1.2-.1 1.7-.2l1.9.9-.5-1.7c1.7-.9 2.7-2.3 2.7-3.7Z"
+											fill="currentColor"
+											stroke="none"
+										/>
+										<g fill="#fff" stroke="none">
+											<circle cx="7" cy="8.6" r="1" />
+											<circle cx="11.4" cy="8.6" r="1" />
+											<circle cx="14.6" cy="13.6" r=".85" />
+											<circle cx="18.4" cy="13.6" r=".85" />
+										</g>
+									</svg>
+								)}
+							</span>
+							<span class="coffee-pay-name">{m.name}</span>
+						</button>
+					))
+				}
+			</div>
+		</div>
+
+		{
+			METHODS.map((m) => (
+				<div class="coffee-qr-page" data-coffee-page={m.id} hidden>
+					<h2 class="coffee-qr-title">
+						<svg class="coffee-title-icon" viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M5 9h11v5.5A3.5 3.5 0 0 1 12.5 18h-4A3.5 3.5 0 0 1 5 14.5V9Z" />
+							<path d="M16 10.5h1.4a2.6 2.6 0 0 1 0 5.2H16" />
+							<path d="M8 3.5v1.8M11.5 3.5v1.8M15 3.5v1.8" />
+						</svg>
+						扫码请我喝杯咖啡
+					</h2>
+					{m.qr ? (
+						<img class="coffee-qr" src={m.qr} alt={`${m.name}收款码`} />
+					) : (
+						<div class="coffee-qr coffee-qr-empty">
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<rect x="3" y="3" width="7" height="7" rx="1.5" />
+								<rect x="14" y="3" width="7" height="7" rx="1.5" />
+								<rect x="3" y="14" width="7" height="7" rx="1.5" />
+								<path d="M14 14h3v3M21 21h-1" />
+							</svg>
+							<span>收款码待上传</span>
+						</div>
+					)}
+					<p class="coffee-qr-tip">{m.tip}</p>
+					<button type="button" class="coffee-back" data-coffee-back>
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6" /></svg>
+						返回
+					</button>
+				</div>
+			))
+		}
+	</div>
+</div>
+
+<script>
+	const mask = document.getElementById('coffeeMask');
+	if (mask) {
+		const popup = mask.querySelector<HTMLElement>('.coffee-popup');
+		const select = mask.querySelector('[data-coffee-page="select"]');
+		const pages = [...mask.querySelectorAll('.coffee-qr-page')];
+		const closeBtn = mask.querySelector('[data-coffee-close]');
+		let lastFocus = null;
+
+		const focusables = () =>
+			[...(popup?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? [])].filter(
+				(el) => el.offsetParent !== null,
+			);
+
+		const showSelect = () => {
+			select?.removeAttribute('hidden');
+			pages.forEach((p) => p.setAttribute('hidden', ''));
+		};
+
+		const showPage = (id) => {
+			select?.setAttribute('hidden', '');
+			pages.forEach((p) => (p.dataset.coffeePage === id ? p.removeAttribute('hidden') : p.setAttribute('hidden', '')));
+			popup?.focus();
+		};
+
+		const open = () => {
+			lastFocus = document.activeElement;
+			showSelect();
+			const gap = window.innerWidth - document.documentElement.clientWidth;
+			document.body.style.paddingRight = gap > 0 ? `${gap}px` : '';
+			document.body.style.overflow = 'hidden';
+			mask.removeAttribute('hidden');
+			mask.classList.add('open');
+			popup?.focus();
+		};
+
+		const close = () => {
+			mask.classList.remove('open');
+			mask.setAttribute('hidden', '');
+			document.body.style.overflow = '';
+			document.body.style.paddingRight = '';
+			if (lastFocus instanceof HTMLElement) lastFocus.focus();
+		};
+
+		document.querySelectorAll('[data-donate]').forEach((el) => {
+			el.addEventListener('click', (e) => {
+				e.preventDefault();
+				open();
+			});
+		});
+
+		closeBtn?.addEventListener('click', close);
+		mask.addEventListener('click', (e) => {
+			if (e.target === mask) close();
+		});
+		document.addEventListener('keydown', (e) => {
+			if (!mask.classList.contains('open')) return;
+			if (e.key === 'Escape') {
+				close();
+				return;
+			}
+			if (e.key !== 'Tab') return;
+			const list = focusables();
+			if (!list.length) return;
+			const first = list[0];
+			const last = list[list.length - 1];
+			if (e.shiftKey && document.activeElement === first) {
+				e.preventDefault();
+				last.focus();
+			} else if (!e.shiftKey && document.activeElement === last) {
+				e.preventDefault();
+				first.focus();
+			}
+		});
+		mask.querySelectorAll('[data-coffee-pay]').forEach((el) => {
+			el.addEventListener('click', () => showPage((el as HTMLElement).dataset.coffeePay));
+		});
+		mask.querySelectorAll('[data-coffee-back]').forEach((el) => {
+			el.addEventListener('click', showSelect);
+		});
+	}
+</script>
