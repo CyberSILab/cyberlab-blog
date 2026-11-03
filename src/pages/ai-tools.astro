@@ -23,7 +23,6 @@ const entries = await getCollection('blog');
 		<main>
 			<div class="layout">
 				<section>
-					<p class="tagstat">共 {TOOLS.length} 个工具 · 博客教程里用到的运行环境与 API，点击打开官网</p>
 					<div class="grid">
 						{TOOLS.map((t) => (
 							<a class="card" href={t.url} target="_blank" rel="noopener">
