@@ -2,19 +2,21 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
+const coverSchema = z.object({
+	lines: z.array(z.string()).min(1).max(2),
+	sub: z.string(),
+	cls: z.enum(['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8']),
+});
+
 const blog = defineCollection({
-	// Load Markdown and MDX files in the `src/content/blog/` directory.
-	loader: glob({ base: './src/content/blog', pattern: '**/*.{md,mdx}' }),
-	// Type-check frontmatter using a schema
-	schema: ({ image }) =>
-		z.object({
-			title: z.string(),
-			description: z.string(),
-			// Transform string to Date object
-			pubDate: z.coerce.date(),
-			updatedDate: z.coerce.date().optional(),
-			heroImage: z.optional(image()),
-		}),
+	loader: glob({ base: './src/content/blog', pattern: '**/*.md' }),
+	schema: z.object({
+		title: z.string(),
+		pubDate: z.coerce.date(),
+		tags: z.array(z.string()).min(1),
+		cover: coverSchema,
+		hot: z.number().int().positive().optional(),
+	}),
 });
 
 export const collections = { blog };
