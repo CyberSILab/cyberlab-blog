@@ -1,0 +1,10 @@
+---
+import type { BlogEntry } from '../lib/site';
+const { posts }: { posts: BlogEntry[] } = Astro.props;
+---
+<div class="panel">
+	<div class="p-head"><h2>热门视频</h2><a href="/ai-tools/">更多</a></div>
+	<div class="rank">
+		{posts.map((p) => <a href={`/blog/${p.id}/`}><span class="n">{p.data.hot}</span><span class="t">{p.data.title}</span></a>)}
+	</div>
+</div>

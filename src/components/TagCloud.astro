@@ -1,0 +1,9 @@
+---
+const { tags }: { tags: { name: string; count: number }[] } = Astro.props;
+---
+<div class="panel">
+	<div class="p-head"><h2>所有标签</h2><a href="/tags/">更多</a></div>
+	<div class="cloud">
+		{tags.map((t) => <a href={`/?tag=${encodeURIComponent(t.name)}`}>{t.name}</a>)}
+	</div>
+</div>

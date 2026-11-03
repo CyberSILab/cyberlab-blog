@@ -1,0 +1,7 @@
+---
+const { cover, variant = 'card' } = Astro.props;
+---
+<div class:list={['cover', cover.cls, 'post-cover': variant === 'post']}>
+	<span class="k">{cover.lines.join('\n')}</span>
+	<span class="s">{cover.sub}</span>
+</div>

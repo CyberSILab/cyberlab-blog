@@ -44,7 +44,7 @@ main { max-width: 1400px; margin: 0 auto; padding: 24px 20px 40px }
 .card:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(26,26,26,.08) }
 .cover { aspect-ratio: 16/9; position: relative; display: flex; flex-direction: column; justify-content: center; padding: 16px; color: #fff; overflow: hidden }
 .cover::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 80% at 80% 10%, rgba(255,255,255,.22), transparent 55%) }
-.cover .k { font-size: 21px; font-weight: 900; letter-spacing: .5px; line-height: 1.2; text-shadow: 0 2px 0 rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.4); transform: skewX(-6deg) }
+.cover .k { font-size: 21px; font-weight: 900; letter-spacing: .5px; line-height: 1.2; text-shadow: 0 2px 0 rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.4); transform: skewX(-6deg); white-space: pre-line }
 .cover .s { margin-top: 8px; font-size: 11px; font-weight: 700; background: rgba(0,0,0,.35); align-self: flex-start; padding: 3px 9px; border-radius: 6px; letter-spacing: .4px }
 .c1 { background: linear-gradient(135deg,#0E1A3C,#123B7A 45%,#0FD9C5) }
 .c2 { background: linear-gradient(135deg,#1B0F4D,#5B2BD1 50%,#FF4D8D) }
@@ -146,3 +146,7 @@ a.tag:hover { background: #D6E4FF }
 @media (max-width: 1100px) { .layout { grid-template-columns: 1fr } .grid { grid-template-columns: repeat(3, 1fr) } }
 @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr) } .nav a span { display: none } .search { min-width: 0; flex: 1 } }
 @media (max-width: 560px) { .grid { grid-template-columns: 1fr } .post-cover .k { font-size: 22px } }
+
+/* 搜索输入框（接成真实过滤，见计划 Task 2/3） */
+.search-input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; outline: none }
+.search:focus-within { border-color: var(--accent) }

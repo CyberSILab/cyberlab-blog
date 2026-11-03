@@ -1,0 +1,12 @@
+---
+const { months }: { months: { value: string; label: string }[] } = Astro.props;
+---
+<div class="panel">
+	<div class="p-head"><h2>归档</h2></div>
+	<div class="select">
+		<select id="monthSelect" aria-label="选择月份">
+			<option value="">选择月份</option>
+			{months.map((m) => <option value={m.value}>{m.label}</option>)}
+		</select>
+	</div>
+</div>
