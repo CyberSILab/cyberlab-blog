@@ -84,6 +84,7 @@ a.tag:hover { background: #D6E4FF }
 .p-head a { color: var(--muted); font-size: 12px }
 .p-head a:hover { color: var(--accent) }
 .avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg,#E23A2E,#FF7A5A); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; font-size: 24px; margin: 0 auto 10px }
+img.avatar { object-fit: cover }
 .bio { color: #4A4F55; font-size: 12.5px; line-height: 1.6; margin: 0 0 12px; text-align: center }
 .social { display: flex; justify-content: center; gap: 10px; margin-bottom: 14px }
 .social a { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; color: #5A6067 }
