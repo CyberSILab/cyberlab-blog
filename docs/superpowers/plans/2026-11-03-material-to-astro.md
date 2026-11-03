@@ -157,12 +157,12 @@ git commit -m "feat: 文章迁入 content collections，清理模板示例与无
   - `BaseHead.astro` props: `title: string, description: string`（内部 import `../styles/global.css` 与 RSS 链接）
   - `CoverCard.astro` props: `cover: {lines, sub, cls}`, `variant?: 'card' | 'post'`（post 加 `post-cover` 类）
   - `ClockIcon.astro` props: 无
-  - `AboutPanel.astro` props: 无；`HotPanel.astro` props: `posts: {id: string, title: string, hot: number}[]`；`TagCloud.astro` props: `tags: {name: string, count: number}[]`；`MonthPanel.astro` props: `months: {value: string, label: string}[]`
+  - `AboutPanel.astro` props: 无；`HotPanel.astro` props: `posts: BlogEntry[]`（渲染 `p.id`/`p.data.title`/`p.data.hot`——Ledger: Task 2 Ruling，与 `hotPosts` 的真实返回一致）；`TagCloud.astro` props: `tags: {name: string, count: number}[]`；`MonthPanel.astro` props: `months: {value: string, label: string}[]`
   - `src/lib/site.ts`：`fmtDate(d: Date): string`、`allTags(entries): {name, count}[]`、`monthList(entries): {value, label}[]`、`hotPosts(entries): entry[]`、`relatedOf(entry, entries): entry[]`（≤4）、`prevNextOf(entry, entries): {prev: entry | undefined, next: entry | undefined}`
 
 - [ ] **Step 1: global.css 换成 blog.css**
 
-把 `素材/blog.css` 全文原样写入 `src/styles/global.css`（148 行，含全部 @media 断点）。
+把 `素材/blog.css` 全文原样写入 `src/styles/global.css`（148 行，含全部 @media 断点），并追加两处：`.cover .k` 规则里加 `white-space: pre-line`（CoverCard 用 `join('\n')` 换行，Ledger: Task 2 Ruling）；Step 4 的搜索样式。
 
 - [ ] **Step 2: 写 `src/lib/site.ts`**
 
@@ -171,7 +171,9 @@ import type { CollectionEntry } from 'astro:content';
 
 export type BlogEntry = CollectionEntry<'blog'>;
 
-export const fmtDate = (d: Date): string => d.toISOString().slice(0, 10);
+// props 经 JSON 序列化后日期会变成字符串，两种都要吃（Ledger: Task 2 Ruling）
+export const fmtDate = (d: Date | string): string =>
+	typeof d === 'string' ? d.slice(0, 10) : d.toISOString().slice(0, 10);
 
 export const allTags = (entries: BlogEntry[]) => {
 	const map = new Map<string, number>();
@@ -475,7 +477,7 @@ export const TOOLS: Tool[] = [ /* 9 项，字段值与素材逐字一致 */ ];
 
 - [ ] **Step 3: `src/pages/ai-tools.astro`**
 
-结构 = 素材 ai-tools.html:24–37（tagstat + grid；aside 放 AboutPanel + HotPanel + TagCloud）。卡片 = 素材 ai-tools.html:51–57 的 buildCard 逻辑（cover 用 `CoverCard`，desc 进 card-title，tags 进 `.tags`），外链 `target="_blank" rel="noopener"`。`Header active="ai-tools"`。
+结构 = 素材 ai-tools.html:24–37（tagstat + grid；aside 放 AboutPanel + HotPanel + TagCloud）。卡片 = 素材 ai-tools.html:51–57 的 buildCard 逻辑：`<a class="card" href={t.url} target="_blank" rel="noopener">` 内 `<CoverCard cover={{lines: [t.name, t.tagline], sub: t.sub, cls: t.cls}} />`（Ledger: Task 5 Ruling）+ card-body（desc 进 card-title，tags 进 `.tags`）。`Header active="ai-tools"`。
 
 - [ ] **Step 4: 验证**
 
