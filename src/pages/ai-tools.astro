@@ -3,12 +3,11 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import AboutPanel from '../components/AboutPanel.astro';
-import HotPanel from '../components/HotPanel.astro';
 import TagCloud from '../components/TagCloud.astro';
 import CoverCard from '../components/CoverCard.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
-import { allTags, hotPosts } from '../lib/site';
+import { allTags } from '../lib/site';
 import { TOOLS } from '../data/tools';
 const entries = await getCollection('blog');
 ---
@@ -38,7 +37,6 @@ const entries = await getCollection('blog');
 
 				<aside class="aside">
 					<AboutPanel />
-					<HotPanel posts={hotPosts(entries)} />
 					<TagCloud tags={allTags(entries)} />
 				</aside>
 			</div>

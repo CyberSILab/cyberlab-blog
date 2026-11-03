@@ -3,10 +3,9 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import AboutPanel from '../components/AboutPanel.astro';
-import HotPanel from '../components/HotPanel.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
-import { allTags, hotPosts } from '../lib/site';
+import { allTags } from '../lib/site';
 const entries = await getCollection('blog');
 const tags = allTags(entries);
 ---
@@ -32,7 +31,6 @@ const tags = allTags(entries);
 
 				<aside class="aside">
 					<AboutPanel />
-					<HotPanel posts={hotPosts(entries)} />
 				</aside>
 			</div>
 		</main>

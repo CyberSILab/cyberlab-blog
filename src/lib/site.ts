@@ -19,9 +19,6 @@ export const monthList = (entries: BlogEntry[]) => {
 	return [...set].sort().reverse().map((v) => ({ value: v, label: v.slice(0, 4) + ' 年 ' + Number(v.slice(5, 7)) + ' 月' }));
 };
 
-export const hotPosts = (entries: BlogEntry[]) =>
-	entries.filter((p) => p.data.hot).sort((a, b) => (a.data.hot ?? 0) - (b.data.hot ?? 0));
-
 export const relatedOf = (entry: BlogEntry, entries: BlogEntry[]) =>
 	entries
 		.filter((p) => p.id !== entry.id && p.data.tags.some((t) => entry.data.tags.includes(t)))
