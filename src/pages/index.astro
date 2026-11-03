@@ -1,59 +1,137 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Footer from '../components/Footer.astro';
+import AboutPanel from '../components/AboutPanel.astro';
+import HotPanel from '../components/HotPanel.astro';
+import TagCloud from '../components/TagCloud.astro';
+import MonthPanel from '../components/MonthPanel.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+import { fmtDate, allTags, monthList, hotPosts } from '../lib/site';
+const entries = (await getCollection('blog')).sort((a, b) => (b.data.pubDate as unknown as number) - (a.data.pubDate as unknown as number));
+const META = JSON.stringify(entries.map((e) => ({
+	id: e.id, title: e.data.title, date: fmtDate(e.data.pubDate),
+	tags: e.data.tags, cover: e.data.cover, hot: e.data.hot ?? null,
+})));
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hans">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={`${SITE_TITLE} · 网站首页`} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
-		<Header />
+		<Header active="home" />
+
+		<script id="postMeta" type="application/json" set:html={META}></script>
+
 		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to
-				build a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your{' '}
-				<code>astro.config.mjs</code> file. You can customize your setup with{' '}
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like
-				Tailwind, React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>
-					Edit this page in <code>src/pages/index.astro</code>
-				</li>
-				<li>
-					Edit the site header items in <code>src/components/Header.astro</code>
-				</li>
-				<li>
-					Add your name to the footer in <code>src/components/Footer.astro</code>
-				</li>
-				<li>
-					Check out the included blog posts in <code>src/content/blog/</code>
-				</li>
-				<li>
-					Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code>
-				</li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to{' '}
-				<a href="https://docs.astro.build/">read the docs</a> or{' '}
-				<a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out{' '}
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a> by{' '}
-				<a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+			<div class="layout">
+				<section>
+					<div class="filterbar" id="filterbar"></div>
+					<div class="grid" id="grid"></div>
+					<p class="empty-tip" id="emptyTip">当前筛选条件下暂无内容</p>
+					<div class="pager" id="pager"></div>
+				</section>
+
+				<aside class="aside">
+					<AboutPanel />
+					<HotPanel posts={hotPosts(entries)} />
+					<TagCloud tags={allTags(entries)} />
+					<MonthPanel months={monthList(entries)} />
+				</aside>
+			</div>
 		</main>
+
 		<Footer />
+
+		<script is:inline>
+const META = JSON.parse(document.getElementById('postMeta').textContent);
+	// 主页交互：网格/筛选/分页/搜索（移植自素材 博客主页.html，数据源为构建期内嵌的 META）
+	const PAGE_SIZE = 15; // 每页 5 行 x 3 列
+	let page = 1, month = '', tag = '', q = '';
+	const tip = document.getElementById('emptyTip');
+	const pager = document.getElementById('pager');
+	const grid = document.getElementById('grid');
+	const filterbar = document.getElementById('filterbar');
+	const sel = document.getElementById('monthSelect');
+
+	const params = new URLSearchParams(location.search);
+	if (params.get('tag')) tag = params.get('tag');
+	if (params.get('q')) { q = params.get('q'); document.getElementById('searchInput').value = q; }
+
+	function filtered() {
+		return META.filter(p =>
+			(!month || p.date.slice(0, 7) === month) &&
+			(!tag || p.tags.includes(tag)) &&
+			(!q || p.title.includes(q) || p.tags.some(t => t.includes(q))));
+	}
+
+	function renderFilterbar() {
+		if (!month && !tag && !q) { filterbar.classList.remove('show'); filterbar.innerHTML = ''; return; }
+		let h = '筛选中：';
+		if (month) h += ' 月份 <b>' + month + '</b>';
+		if (tag) h += ' 标签 <b>' + tag + '</b>';
+		if (q) h += ' 关键词 <b>' + q + '</b>';
+		h += '<a href="/">清除筛选 ✕</a>';
+		filterbar.innerHTML = h;
+		filterbar.classList.add('show');
+	}
+
+	function clockIcon() {
+		return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>';
+	}
+
+	function buildCard(p) {
+		const k = p.cover.lines.join('<br>');
+		const tags = p.tags.map(t => '<span class="tag">' + t + '</span>').join('');
+		return '<a class="card" href="/blog/' + encodeURIComponent(p.id) + '/">' +
+			'<div class="cover ' + p.cover.cls + '"><span class="k">' + k + '</span><span class="s">' + p.cover.sub + '</span></div>' +
+			'<div class="card-body"><h2 class="card-title">' + p.title + '</h2>' +
+			'<div class="card-meta">' + clockIcon() + p.date + '</div>' +
+			'<div class="tags">' + tags + '</div></div></a>';
+	}
+
+	function render() {
+		const list = filtered();
+		const total = list.length;
+		const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+		if (page > pages) page = pages;
+		const start = (page - 1) * PAGE_SIZE;
+		grid.innerHTML = list.slice(start, start + PAGE_SIZE).map(buildCard).join('');
+		tip.classList.toggle('show', total === 0);
+		renderFilterbar();
+		let html = '<a href="#" data-act="prev"' + (page === 1 ? ' class="dis"' : '') + '>上一页</a>';
+		for (let i = 1; i <= pages; i++) html += '<a href="#" data-p="' + i + '"' + (i === page ? ' class="on"' : '') + '>' + i + '</a>';
+		html += '<a href="#" data-act="next"' + (page === pages ? ' class="dis"' : '') + '>下一页</a>';
+		pager.innerHTML = html;
+	}
+
+	pager.addEventListener('click', e => {
+		const a = e.target.closest('a');
+		if (!a) return;
+		e.preventDefault();
+		if (a.dataset.p) page = Number(a.dataset.p);
+		else if (a.dataset.act === 'prev') page = Math.max(1, page - 1);
+		else if (a.dataset.act === 'next') page += 1;
+		else return;
+		render();
+	});
+
+	sel.addEventListener('change', () => {
+		month = sel.value;
+		page = 1;
+		render();
+	});
+
+	document.getElementById('searchInput').addEventListener('input', e => {
+		q = e.target.value.trim();
+		page = 1;
+		render();
+	});
+
+	render();
+		</script>
 	</body>
 </html>
