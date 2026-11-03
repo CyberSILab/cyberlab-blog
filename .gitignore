@@ -25,3 +25,5 @@ pnpm-debug.log*
 
 # OpenChamber 会话产物（浏览器截图等）
 .openchamber/
+# 设计原型素材（本地草稿，不入库）
+素材/
