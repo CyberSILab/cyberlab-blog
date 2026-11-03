@@ -22,7 +22,7 @@ const META = JSON.stringify(entries.map((e) => ({
 		<BaseHead title={`${SITE_TITLE} · 网站首页`} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
-		<Header active="home" />
+		<Header active="home" searchJump={false} />
 
 		<script id="postMeta" type="application/json" set:html={META}></script>
 

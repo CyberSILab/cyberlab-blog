@@ -7,8 +7,10 @@ export const fmtDate = (d: Date | string): string =>
 	typeof d === 'string' ? d.slice(0, 10) : d.toISOString().slice(0, 10);
 
 export const allTags = (entries: BlogEntry[]) => {
+	// 与素材口径一致：按日期降序遍历，并列计数保持原型插入顺序（终审 Important-1）
+	const ordered = [...entries].sort((a, b) => (fmtDate(b.data.pubDate) > fmtDate(a.data.pubDate) ? 1 : -1));
 	const map = new Map<string, number>();
-	for (const p of entries) for (const t of p.data.tags) map.set(t, (map.get(t) ?? 0) + 1);
+	for (const p of ordered) for (const t of p.data.tags) map.set(t, (map.get(t) ?? 0) + 1);
 	return [...map.entries()].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
 };
 

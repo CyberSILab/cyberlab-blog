@@ -1,5 +1,11 @@
 ---
-const { active = 'home' }: { active?: 'home' | 'ai-tools' | 'tags' | 'about' } = Astro.props;
+const {
+	active = 'home',
+	searchJump = true,
+}: {
+	active?: 'home' | 'ai-tools' | 'tags' | 'about' | 'none';
+	searchJump?: boolean;
+} = Astro.props;
 ---
 <header class="site-head">
 	<div class="head-inner">
@@ -13,7 +19,7 @@ const { active = 'home' }: { active?: 'home' | 'ai-tools' | 'tags' | 'about' } =
 		<label class="search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 4 4"/></svg><input class="search-input" id="searchInput" type="search" placeholder="搜索关键词..." aria-label="搜索关键词" /></label>
 	</div>
 </header>
-{active !== 'home' && <script is:inline>
+{searchJump && <script is:inline>
 	document.getElementById('searchInput').addEventListener('keydown', (e) => {
 		if (e.key === 'Enter' && e.target.value.trim()) location.href = '/?q=' + encodeURIComponent(e.target.value.trim());
 	});
