@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# OpenChamber 会话产物（浏览器截图等）
+.openchamber/
