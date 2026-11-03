@@ -1,0 +1,61 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import HotPanel from '../components/HotPanel.astro';
+import TagCloud from '../components/TagCloud.astro';
+import MonthPanel from '../components/MonthPanel.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+import { allTags, monthList, hotPosts } from '../lib/site';
+const entries = await getCollection('blog');
+---
+
+<!doctype html>
+<html lang="zh-Hans">
+	<head>
+		<BaseHead title={`${SITE_TITLE} · 关于博主`} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header active="about" />
+		<main>
+			<div class="layout">
+				<section>
+					<div class="panel">
+						<div class="about-hero">
+							<div class="avatar">赛</div>
+							<p class="bio" style="margin-bottom:0">大家好！这里是赛博实验室。</p>
+							<div class="social" style="margin-top:12px;margin-bottom:0">
+								<a href="#" title="视频主页"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 9 5 3-5 3V9Z"/></svg></a>
+								<a href="#" title="RSS"><svg viewBox="0 0 24 24"><path d="M4 17V7l4 4 4-6v12M14 9h6"/></svg></a>
+								<a href="#" title="联系"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 10h.01M16 10h.01M8.5 15a4 4 0 0 0 7 0"/></svg></a>
+							</div>
+						</div>
+						<div class="about-body">
+							<h2>这个博客是做什么的</h2>
+							<p>赛博实验室分享 AI 实战、系统开发与高效工具的实用教程：以「本地部署 + 实测」为主线，把每个模型能跑在什么显卡上、速度多少、效果如何，都实测出来写清楚。视频与图文互补，教程都能照着复现。</p>
+							<h2>内容方向</h2>
+							<ul>
+								<li>AI 大模型 / 多模态 / 识图 / 文生图模型的本地部署教程与实测数据</li>
+								<li>Ollama、llama.cpp、ComfyUI 等工具的用法与工作流</li>
+								<li>Cloudflare、API 服务与系统开发的实用技巧</li>
+							</ul>
+							<h2>更新节奏</h2>
+							<p>大约每周 2-3 篇，新模型发布当天就会出部署实测。所有帖子按标签归档，方便按主题查找。</p>
+							<h2>联系与支持</h2>
+							<p>有问题欢迎留言交流；觉得内容有用的话，请我喝杯咖啡就是最大的支持。</p>
+							<a class="coffee" href="#" style="max-width:260px;margin-top:8px"><svg viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M4 8h12v6a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V8Zm12 1h2a2 2 0 0 1 0 4h-2M8 3v2M12 3v2"/></svg>请我喝咖啡</a>
+						</div>
+					</div>
+				</section>
+
+				<aside class="aside">
+					<HotPanel posts={hotPosts(entries)} />
+					<TagCloud tags={allTags(entries)} />
+					<MonthPanel months={monthList(entries)} />
+				</aside>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
