@@ -1,0 +1,49 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import AboutPanel from '../components/AboutPanel.astro';
+import HotPanel from '../components/HotPanel.astro';
+import TagCloud from '../components/TagCloud.astro';
+import CoverCard from '../components/CoverCard.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+import { allTags, hotPosts } from '../lib/site';
+import { TOOLS } from '../data/tools';
+const entries = await getCollection('blog');
+---
+
+<!doctype html>
+<html lang="zh-Hans">
+	<head>
+		<BaseHead title={`${SITE_TITLE} · AI工具`} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header active="ai-tools" />
+		<main>
+			<div class="layout">
+				<section>
+					<p class="tagstat">共 {TOOLS.length} 个工具 · 博客教程里用到的运行环境与 API，点击打开官网</p>
+					<div class="grid">
+						{TOOLS.map((t) => (
+							<a class="card" href={t.url} target="_blank" rel="noopener">
+								<CoverCard cover={{ lines: [t.name, t.tagline], sub: t.sub, cls: t.cls }} />
+								<div class="card-body">
+									<h2 class="card-title" style="-webkit-line-clamp:3;min-height:calc(1.45em*3)">{t.desc}</h2>
+									<div class="tags">{t.tags.map((x) => <span class="tag">{x}</span>)}</div>
+								</div>
+							</a>
+						))}
+					</div>
+				</section>
+
+				<aside class="aside">
+					<AboutPanel />
+					<HotPanel posts={hotPosts(entries)} />
+					<TagCloud tags={allTags(entries)} />
+				</aside>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>

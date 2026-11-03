@@ -1,0 +1,41 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import AboutPanel from '../components/AboutPanel.astro';
+import HotPanel from '../components/HotPanel.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+import { allTags, hotPosts } from '../lib/site';
+const entries = await getCollection('blog');
+const tags = allTags(entries);
+---
+
+<!doctype html>
+<html lang="zh-Hans">
+	<head>
+		<BaseHead title={`${SITE_TITLE} · 所有标签`} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header active="tags" />
+		<main>
+			<div class="layout">
+				<section>
+					<div class="panel">
+						<div class="p-head"><h2>所有标签</h2></div>
+						<p class="tagstat">共 {tags.length} 个标签 · {entries.length} 篇内容 · 点击标签按该主题筛选</p>
+						<div class="tagboard">
+							{tags.map((t) => <a href={`/?tag=${encodeURIComponent(t.name)}`}>{t.name}<span class="cnt">{t.count}</span></a>)}
+						</div>
+					</div>
+				</section>
+
+				<aside class="aside">
+					<AboutPanel />
+					<HotPanel posts={hotPosts(entries)} />
+				</aside>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
