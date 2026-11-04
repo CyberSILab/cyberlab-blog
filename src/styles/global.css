@@ -127,8 +127,10 @@ img.avatar { object-fit: cover }
 .cloud a { font-size: 12px; color: #3C4250; background: #F2F5FA; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px }
 .cloud a:hover { border-color: var(--accent); color: var(--accent) }
 .select { position: relative }
-.select select { width: 100%; padding: 9px 36px 9px 12px; border: 1px solid #C9CFD6; border-radius: 8px; background: #fff; color: #3C4046; font-size: 13px; font-family: inherit }
-.select::after { content: ""; position: absolute; right: 14px; top: 50%; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: translateY(-70%) rotate(45deg); pointer-events: none }
+/* appearance:none 关掉浏览器自带的箭头，只留下面 ::after 画的那一个，避免出现两个箭头 */
+.select select { width: 100%; padding: 9px 36px 9px 12px; border: 1px solid #C9CFD6; border-radius: 8px; background: #fff; color: #3C4046; font-size: 13px; font-family: inherit; text-align: left; cursor: pointer; appearance: none; -webkit-appearance: none }
+.select select:focus, .select select:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(43,107,255,.14) }
+.select::after { content: ""; position: absolute; right: 15px; top: 50%; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: translateY(-70%) rotate(45deg); pointer-events: none }
 
 /* ===== 帖子详情页 ===== */
 .post-cover { min-height: 260px; border-radius: 12px 12px 0 0; padding: 28px 32px }
