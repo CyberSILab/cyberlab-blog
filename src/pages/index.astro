@@ -55,7 +55,9 @@ const META = JSON.stringify(entries.map((e) => {
 		<script is:inline>
 const META = JSON.parse(document.getElementById('postMeta').textContent);
 	// 主页交互：网格/筛选/分页/搜索（移植自素材 博客主页.html，数据源为构建期内嵌的 META）
-	const PAGE_SIZE = 15; // 每页 5 行 x 3 列
+	// 每页条数随断点走：桌面 5 行 × 3 列 = 15；手机单列时 9 条，别让一页滚太久
+	const narrow = window.matchMedia('(max-width: 600px)');
+	let PAGE_SIZE = narrow.matches ? 9 : 15;
 	let page = 1, month = '', tag = '', q = '';
 	const tip = document.getElementById('emptyTip');
 	const pager = document.getElementById('pager');
@@ -153,6 +155,11 @@ const META = JSON.parse(document.getElementById('postMeta').textContent);
 		page = 1;
 		render();
 	});
+
+	// 旋转屏幕 / 拖动窗口跨过断点时，重算每页条数并回到第一页
+	const onBreakpoint = () => { PAGE_SIZE = narrow.matches ? 9 : 15; page = 1; render(); };
+	if (narrow.addEventListener) narrow.addEventListener('change', onBreakpoint);
+	else if (narrow.addListener) narrow.addListener(onBreakpoint);
 
 	render();
 		</script>
