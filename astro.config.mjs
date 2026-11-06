@@ -17,6 +17,8 @@ export default defineConfig({
 	site: 'https://example.com',
 	markdown: {
 		shikiConfig: {
+			// 站点是浅色底，代码高亮也必须用浅色主题，否则 github-dark 的浅色字会看不清
+			theme: 'github-light',
 			transformers: [stripShikiInlineStyles],
 		},
 	},
