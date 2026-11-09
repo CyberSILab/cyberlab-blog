@@ -30,7 +30,7 @@ cover:
 | 项目 | 配置 |
 | --- | --- |
 | 操作系统 | Windows 11 64-bit 家庭版 |
-| 显卡 | NVIDIA RTX 2000 Ada Laptop GPU（8GB） |
+| 显卡 | NVIDIA RTX 4090D（24GB） |
 | 处理器 | 13th Gen Intel Core i7-13700H |
 | 内存 | 32GB DDR5 5600MHz |
 | 存储 | NVMe SSD，预留 15GB 以上 |
