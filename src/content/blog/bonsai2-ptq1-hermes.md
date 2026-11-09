@@ -93,32 +93,32 @@ PTQ1_0 只有 [Prism 的 llama.cpp 分支](https://github.com/PrismML-Eng/llama.
 ```powershell
 .\llama-server.exe `
   -m ..\models\Ternary-Bonsai-2-27B-Abliterated-v2-PTQ1_0.gguf `
-  -ngl 99 -fa on -c 32768 `
+  -ngl 99 -fa on -c 65536 `
   -ctk q8_0 -ctv q4_0 `
   --jinja --reasoning on --reasoning-effort medium `
   --temp 1.0 --top-p 0.95 --top-k 20 `
   --host 127.0.0.1 --port 8080 `
-  --alias qwen3.8-27 `
+  --alias bonsai2 `
   --mmproj ..\models\Ternary-Bonsai-2-27B-mmproj-Q8_0.gguf
 ```
 
-最后一行是视觉塔，不传图片可以删掉，同时把上一行末尾的反引号去掉。8GB 卡加载 mmproj 会再占约 0.6GB 显存。
+最后一行是视觉塔，不传图片可以删掉，同时把上一行末尾的反引号去掉。加载 mmproj 会再占约 0.6GB 显存。
 
 各参数的作用：
 
-| 参数 | 作用 | 8GB 显存建议 |
+| 参数 | 作用 | 显存建议 |
 | --- | --- | --- |
 | `-m` | 模型文件路径 | 必填 |
 | `-ngl 99` | 所有层放 GPU；`0` 是纯 CPU | 保持 99 |
 | `-fa on` | Flash Attention，明显降低 KV 缓存占用 | 必开 |
-| `-c 32768` | 上下文长度，最大 262144 | 8GB 卡开 32K |
+| `-c 65536` | 上下文长度，最大 262144 | 24GB 卡开 64K |
 | `-ctk q8_0` | K 缓存量化成 8bit | K8，省显存 |
 | `-ctv q4_0` | V 缓存量化成 4bit | V4，省得更狠 |
 | `--jinja` | 用模型自带的 chat template，Hermes 的工具调用依赖它 | 这个构建默认已开启，写上更保险 |
 | `--reasoning on` | 开启思考模式 | 保持 |
 | `--reasoning-effort medium` | 思考预算；默认 `xhigh` 更长更慢，`low` 不支持 | 用 `medium` |
 | `--temp 1.0 --top-p 0.95 --top-k 20` | 官方推荐的思考模式采样参数 | 照抄 |
-| `--alias qwen3.8-27` | API 里返回的模型名，Hermes 配置要填它 | 保持 |
+| `--alias bonsai2` | API 里返回的模型名，Hermes 配置要填它 | 保持 |
 | `--mmproj` | 视觉塔，传图片才需要 | 不用图就删 |
 
 启动后用浏览器打开 `http://127.0.0.1:8080`，就能直接对话。
@@ -144,10 +144,10 @@ set "ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/" && Hermes-Setup.ex
 curl.exe http://127.0.0.1:8080/v1/models
 ```
 
-返回里的 `id` 就是模型名。我们在启动参数里用 `--alias qwen3.8-27` 把它固定住了；不加 alias 的话，这个 id 会变成模型文件的路径（带反斜杠），填进 Hermes 容易出错。本例是：
+返回里的 `id` 就是模型名。我们在启动参数里用 `--alias bonsai2` 把它固定住了；不加 alias 的话，这个 id 会变成模型文件的路径（带反斜杠），填进 Hermes 容易出错。本例是：
 
 ```text
-qwen3.8-27
+bonsai2
 ```
 
 然后写进 Hermes 配置（桌面版和命令行版共用这一份配置）：
@@ -155,10 +155,10 @@ qwen3.8-27
 ```powershell
 hermes config set model.provider custom
 hermes config set model.base_url http://127.0.0.1:8080/v1
-hermes config set model.default qwen3.8-27
+hermes config set model.default bonsai2
 ```
 
-不想记命令的话，跑 `hermes model`，选 **Custom endpoint**，按提示填 `http://127.0.0.1:8080/v1` 和 `qwen3.8-27` 就行。
+不想记命令的话，跑 `hermes model`，选 **Custom endpoint**，按提示填 `http://127.0.0.1:8080/v1` 和 `bonsai2` 就行。
 
 也可以直接改 `%LOCALAPPDATA%\hermes\config.yaml`：
 
@@ -166,7 +166,7 @@ hermes config set model.default qwen3.8-27
 model:
   provider: custom
   base_url: http://127.0.0.1:8080/v1
-  default: qwen3.8-27
+  default: bonsai2
 ```
 
 ## 资源下载
